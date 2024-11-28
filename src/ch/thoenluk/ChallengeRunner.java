@@ -1,4 +1,5 @@
 package ch.thoenluk;
+
 import ch.thoenluk.ut.UtParsing;
 import ch.thoenluk.ut.UtStrings;
 
@@ -11,31 +12,32 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.function.UnaryOperator;
 
+import static ch.thoenluk.ut.UtStrings.println;
+
 /**
  *
  * @author Lukas Thöni lukas.thoeni@gmx.ch
  */
 public class ChallengeRunner {
-
-
     private final static Scanner USER_INPUT = new Scanner(System.in);
     private final static String FIRST_CHALLENGE_SUFFIX = "1";
     private final static String SECOND_CHALLENGE_SUFFIX = "2";
+    private File[] challengeFolders;
 
-    public static void main(String[] args) throws Exception {
-        UtStrings.println("Scanning for challenge folders...");
-        final File[] challengeFolders = getChallengeFolders();
+    public void main(final String[] args) throws Exception {
+        println("Scanning for challenge folders...");
+        challengeFolders = getChallengeFolders();
 
-        printChallengeFolderIndices(challengeFolders);
+        printChallengeFolderNames();
 
-        final int selectedChallenge = getSelectedChallengeFromUser(challengeFolders.length);
+        final int selectedChallenge = getSelectedChallengeFromUser();
 
-        testAndRunChristmasSaver(challengeFolders[selectedChallenge], selectedChallenge);
+        testAndRunChristmasSaver(selectedChallenge);
     }
 
     private static File[] getChallengeFolders() {
         final File currentFolder = new File(".");
-        final File[] challengeFolders = currentFolder.listFiles(pathname -> pathname.isDirectory() && pathname.getName().matches("\\d+ .+"));
+        final File[] challengeFolders = currentFolder.listFiles(ChallengeRunner::isProbablyChallengeFolder);
         if (challengeFolders == null) throw new AssertionError();
 
         Arrays.sort(challengeFolders, (o1, o2) -> {
@@ -47,73 +49,74 @@ public class ChallengeRunner {
         return challengeFolders;
     }
 
-    private static void printChallengeFolderIndices(File[] challengeFolders) {
-        UtStrings.println("Found " + challengeFolders.length + " challenges: ");
-        StringBuilder output = new StringBuilder();
+    private void printChallengeFolderNames() {
+        println(STR."Found \{challengeFolders.length} challenges: ");
+        final StringBuilder output = new StringBuilder();
         for (int i = 0; i < challengeFolders.length; i++) {
-            output.append(i).append(":\t").append(challengeFolders[i].getName().replaceAll("\\d+\\s+", "")).append("\n");
+            output.append(STR."\{i}:\t \{challengeFolders[i].getName().replaceAll("\\d+\\s+", "")}\n");
         }
-        output.append("\n").append("Now choose one.");
-        UtStrings.println(output.toString());
+        output.append("\nNow choose one.");
+        println(output.toString());
     }
 
-    private static int getSelectedChallengeFromUser(int highestPossibleChallenge) {
+    private int getSelectedChallengeFromUser() {
         int selectedChallenge = -1;
         while (selectedChallenge < 0) {
             selectedChallenge = USER_INPUT.nextInt();
 
-            if (selectedChallenge < 0 || highestPossibleChallenge < selectedChallenge) {
-                UtStrings.println("Only and exactly one of the above numbers shalt thou choose.");
+            if (selectedChallenge < 0 || challengeFolders.length < selectedChallenge) {
+                println("Only and exactly one of the above numbers shalt thou choose.");
                 selectedChallenge = -1;
             }
         }
         return selectedChallenge;
     }
 
-    private static void testAndRunChristmasSaver(File challengeFolder, int selectedChallenge) throws Exception {
+    private void testAndRunChristmasSaver(final int selectedChallenge) throws Exception {
         final ChristmasSaver christmasSaver = getChristmasSaverForChallenge(selectedChallenge);
+        final File challengeFolder = challengeFolders[selectedChallenge];
 
         testChristmasSaver(challengeFolder, christmasSaver::saveChristmas, FIRST_CHALLENGE_SUFFIX);
 
-        final File[] actualInputFiles = challengeFolder.listFiles((dir, name) -> name.equals("input.txt"));
+        final File[] actualInputFiles = challengeFolder.listFiles((_, name) -> name.equals("input.txt"));
 
         if (actualInputFiles == null) throw new AssertionError();
         if (actualInputFiles.length != 1) throw new AssertionError();
 
-        String input = Files.readString(actualInputFiles[0].toPath());
-        UtStrings.println("Determined the result for the first challenge is:");
+        final String input = Files.readString(actualInputFiles[0].toPath());
+        println("Determined the result for the first challenge is:");
         long millisBeforeStart = System.currentTimeMillis();
-        UtStrings.println(christmasSaver.saveChristmas(input));
-        UtStrings.println("And did it in " + (System.currentTimeMillis() - millisBeforeStart) + "ms!");
+        println(christmasSaver.saveChristmas(input));
+        println(STR."And did it in \{System.currentTimeMillis() - millisBeforeStart}ms!");
 
-        UtStrings.println("What fun that was. Running second challenge...");
+        println("What fun that was. Running second challenge...");
 
         testChristmasSaver(challengeFolder, christmasSaver::saveChristmasAgain, SECOND_CHALLENGE_SUFFIX);
-        UtStrings.println("Determined the result for the second challenge is:");
+        println("Determined the result for the second challenge is:");
         millisBeforeStart = System.currentTimeMillis();
-        UtStrings.println(christmasSaver.saveChristmasAgain(input));
-        UtStrings.println("And did it in " + (System.currentTimeMillis() - millisBeforeStart) + "ms!");
+        println(christmasSaver.saveChristmasAgain(input));
+        println(STR."And did it in \{System.currentTimeMillis() - millisBeforeStart}ms!");
     }
 
     // I do not fear what this method does; I fear what kind of further automation I'll think up next year.
     // 2023 update: I was correct to fear.
-    private static ChristmasSaver getChristmasSaverForChallenge(int challenge) {
-        final File challengeClassFolder = new File(".\\src\\ch\\thoenluk\\solvers\\challenge" + challenge);
+    private static ChristmasSaver getChristmasSaverForChallenge(final int challenge) {
+        final File challengeClassFolder = new File(STR.".\\src\\ch\\thoenluk\\solvers\\challenge\{challenge}");
 
         if (!challengeClassFolder.isDirectory()) throw new AssertionError();
 
-        return Arrays.stream(Objects.requireNonNull(challengeClassFolder.listFiles(file -> file.isFile() && file.getName().endsWith(".java"))))
+        return Arrays.stream(Objects.requireNonNull(challengeClassFolder.listFiles(ChallengeRunner::isJavaFile)))
                 .map(File::getPath)
                 .map(path -> path.substring(6, path.length() - 5).replaceAll("\\\\", "."))
                 .map(name -> {
                     try { return Class.forName(name); }
-                    catch (ClassNotFoundException e) { throw new AssertionError(e); }
+                    catch (final ClassNotFoundException e) { throw new AssertionError(e); }
                 })
                 .filter(ChristmasSaver.class::isAssignableFrom)
                 .map(aClass -> {
                     try {
                         return aClass.asSubclass(ChristmasSaver.class).getConstructor().newInstance();
-                    } catch (ClassCastException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    } catch (final ClassCastException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                         throw new AssertionError(e);
                     }
                 })
@@ -121,12 +124,16 @@ public class ChallengeRunner {
                 .orElseThrow();
     }
 
-    private static void testChristmasSaver(File challengeFolder, UnaryOperator<String> savingMethod, String challengeSuffix) throws IOException {
-        final String inputPrefix = "test" + challengeSuffix + "_input";
-        final String outputPrefix = "test" + challengeSuffix + "_output";
+    private static boolean isJavaFile(final File file) {
+        return file.isFile() && file.getName().endsWith(".java");
+    }
 
-        final File[] testInputs = challengeFolder.listFiles((File dir, String fileName) -> fileName.startsWith(inputPrefix));
-        final File[] testOutputs = challengeFolder.listFiles((File dir, String fileName) -> fileName.startsWith(outputPrefix));
+    private static void testChristmasSaver(final File challengeFolder, final UnaryOperator<String> savingMethod, final String challengeSuffix) throws IOException {
+        final String inputPrefix = STR."test\{challengeSuffix}_input";
+        final String outputPrefix = STR."test\{challengeSuffix}_output";
+
+        final File[] testInputs = challengeFolder.listFiles((_, fileName) -> fileName.startsWith(inputPrefix));
+        final File[] testOutputs = challengeFolder.listFiles((_, fileName) -> fileName.startsWith(outputPrefix));
 
         if (testInputs == null) throw new AssertionError();
         if (testOutputs == null) throw new AssertionError();
@@ -140,25 +147,28 @@ public class ChallengeRunner {
             final File testInput = testInputs[i];
             final File testOutput = testOutputs[i];
 
-            UtStrings.print("Running test " + testInput.getName() + "... ");
+            UtStrings.print(STR."Running test \{testInput.getName()}... ");
             final String testInputString = Files.readString(testInput.toPath());
             final String testOutputString = Files.readString(testOutput.toPath());
             final String actualOutput = savingMethod.apply(testInputString);
 
             if (!actualOutput.equals(testOutputString)) {
-                StringBuilder message = new StringBuilder();
-                message.append("Failed test ").append(testInput.getName()).append("!\n")
-                        .append("Input was:\n")
-                        .append(testInputString).append("\n\n")
-                        .append("And expected output was:\n")
-                        .append(testOutputString).append("\n\n")
-                        .append("But actual output was:\n")
-                        .append(actualOutput);
-                UtStrings.println(message);
-                throw new AssertionError();
+                final String message = STR."""
+                        Failed test \{testInput.getName()}
+                        Input was:
+                        \{testInputString}
+                        And expected output was:
+                        \{testOutputString}
+                        But actual output was:
+                        \{actualOutput}""";
+                throw new AssertionError(message);
             }
 
-            UtStrings.println("Matched " + testOutput.getName());
+            println(STR."Matched \{testOutput.getName()}");
         }
+    }
+
+    private static boolean isProbablyChallengeFolder(final File pathname) {
+        return pathname.isDirectory() && pathname.getName().matches("\\d+ .+");
     }
 }
