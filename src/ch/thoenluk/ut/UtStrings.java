@@ -1,5 +1,8 @@
 package ch.thoenluk.ut;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -24,6 +27,15 @@ public class UtStrings {
 
     public static void println(Object objToPrint) {
         System.out.println(objToPrint);
+    }
+
+    public static String readFile(final File file) {
+        try {
+            return Files.readString(file.toPath());
+        }
+        catch (final IOException e) {
+            throw new AssertionError(e);
+        }
     }
 
     public static String[] splitMultilineString(String multiline) {
