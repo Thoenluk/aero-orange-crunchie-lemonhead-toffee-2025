@@ -10,10 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.StructuredTaskScope;
 import java.util.function.Consumer;
@@ -190,23 +187,10 @@ public class ChallengeRunner {
     //              I abandoned the concept. Types are our greatest asset in Java. Some experiments should not be done.
     // Next day update: That being said, I didn't say I was NOT going to get lazier with annotations and make a nightmare
     //                  of Reflection and possibly steel and oil. More wine, yum yum!
-
-    private static ChristmasSaver getChristmasSaverForChallenge(final int day) {
-        final File challengeClassFolder = new File(".\\src\\ch\\thoenluk\\solvers");
-
-        if (!challengeClassFolder.isDirectory()) throw new AssertionError();
-
-        final Class<? extends ChristmasSaver> christmasSaverClass = findChristmasSaverClassForDay(day);
-        return instantiateChristmasSaver(christmasSaverClass);
-    }
-
-    private static Class<? extends ChristmasSaver> findChristmasSaverClassForDay(final int day) {
-        return findChristmasSaverClasses().stream()
-                .filter(christmasSaverClass -> findDayValue(christmasSaverClass) == day)
-                .findFirst()
-                .orElseThrow();
-    }
-
+    //                  I could package the classes into a record including their package; That'd remove the admittedly
+    //                  less-than-guaranteed operation in wrapChristmasSavingPackage, because there is little guarantee
+    //                  a class was actually loaded from the file system. But in this case, there is, because I'm scanning
+    //                  the file system to begin with. And I wanted to know if I COULD find the folder from the class.
     private static List<? extends Class<? extends ChristmasSaver>> findChristmasSaverClasses() {
         try (final Stream<Path> paths = Files.find(Paths.get(".", "src", "ch", "thoenluk", "solvers"),
                 Integer.MAX_VALUE,
@@ -222,18 +206,19 @@ public class ChallengeRunner {
                     })
                     .filter(ChristmasSaver.class::isAssignableFrom)
                     .map(christmasSaverClass -> (Class<? extends ChristmasSaver>) christmasSaverClass.asSubclass(ChristmasSaver.class))
+                    .sorted(Comparator.comparing(ChallengeRunner::findDayValue))
                     .toList();
         } catch (final IOException e) {
             throw new AssertionError(e);
         }
     }
 
-    private static String toSearchableFilePath(final String filePath) {
-        return filePath.substring(6, filePath.length() - 5).replaceAll("\\\\", ".");
-    }
-
     private static boolean isJavaFile(final Path path, final BasicFileAttributes attrs) {
         return path.toString().endsWith(".java");
+    }
+
+    private static String toSearchableFilePath(final String filePath) {
+        return filePath.substring(6, filePath.length() - 5).replaceAll("\\\\", ".");
     }
 
     private static int findDayValue(final Class<?> christmasSaverClass) {

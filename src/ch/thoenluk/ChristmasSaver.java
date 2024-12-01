@@ -12,7 +12,9 @@ public interface ChristmasSaver {
      * @param input The input as received from the AOC website.
      * @return The output as can be reported back to AOC to receive a star.
      */
-    String saveChristmas(String input);
+    default String saveChristmas(final String input) {
+        return "Idiot forgot to implement";
+    }
 
     /**
      * Save Christmas but for the second challenge.
@@ -20,5 +22,7 @@ public interface ChristmasSaver {
      * @param input The input as received from the AOC website.
      * @return The output as can be reported back to AOC to receive a star.
      */
-    String saveChristmasAgain(String input);
+    default String saveChristmasAgain(final String input) {
+        return "Idiot forgot to implement, or it's the 25th";
+    }
 }

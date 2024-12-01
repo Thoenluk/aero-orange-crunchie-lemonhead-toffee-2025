@@ -7,11 +7,11 @@ public class UtParsing {
     private static final Map<String, Long> STRING_LONG_CACHE = new HashMap<>();
     private static final Map<Character, Integer> CHAR_INTEGER_CACHE = new HashMap<>();
 
-    public static int cachedParseInt(final String stringRepresentation) {
+    public static synchronized int cachedParseInt(final String stringRepresentation) {
         return STRING_INTEGER_CACHE.computeIfAbsent(stringRepresentation, Integer::parseInt);
     }
 
-    public static int cachedParseInt(final String stringRepresentation, final int radix) {
+    public static synchronized int cachedParseInt(final String stringRepresentation, final int radix) {
         if (!STRING_INTEGER_CACHE.containsKey(stringRepresentation)) {
             STRING_INTEGER_CACHE.put(stringRepresentation, Integer.parseInt(stringRepresentation, radix));
         }
@@ -19,11 +19,11 @@ public class UtParsing {
         return STRING_INTEGER_CACHE.get(stringRepresentation);
     }
 
-    public static long cachedParseLong(final String stringRepresentation) {
+    public static synchronized long cachedParseLong(final String stringRepresentation) {
         return STRING_LONG_CACHE.computeIfAbsent(stringRepresentation, Long::parseLong);
     }
 
-    public static long cachedParseLong(final String stringRepresentation, final int radix) {
+    public static synchronized long cachedParseLong(final String stringRepresentation, final int radix) {
         if (!STRING_LONG_CACHE.containsKey(stringRepresentation)) {
             STRING_LONG_CACHE.put(stringRepresentation, Long.parseLong(stringRepresentation, radix));
         }
@@ -31,7 +31,7 @@ public class UtParsing {
         return STRING_LONG_CACHE.get(stringRepresentation);
     }
 
-    public static int cachedGetNumericValue(final char charRepresentation) {
+    public static synchronized int cachedGetNumericValue(final char charRepresentation) {
         return CHAR_INTEGER_CACHE.computeIfAbsent(charRepresentation, Character::getNumericValue);
     }
 

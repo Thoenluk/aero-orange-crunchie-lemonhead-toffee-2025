@@ -8,3 +8,4 @@
 /dataSources.local.xml
 # Input file - it is considered polite not to publish them to prevent reverse engineering
 **/input.txt
+**/out/**
