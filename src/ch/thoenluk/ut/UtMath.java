@@ -74,7 +74,7 @@ public class UtMath {
     }
 
     public static long gcd(final List<Long> numbers) {
-        return numbers.stream().reduce(numbers.get(0), UtMath::gcd);
+        return numbers.stream().reduce(numbers.getFirst(), UtMath::gcd);
     }
 
     public static long lcm(final long a, final long b) {
@@ -82,7 +82,7 @@ public class UtMath {
     }
 
     public static long lcm(final List<Long> numbers) {
-        return numbers.stream().reduce(numbers.get(0), UtMath::lcm);
+        return numbers.stream().reduce(numbers.getFirst(), UtMath::lcm);
     }
 
     public static String restOfTheOwl(final Stream<Integer> stream) {

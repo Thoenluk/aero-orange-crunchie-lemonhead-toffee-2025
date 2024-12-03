@@ -13,11 +13,11 @@ public class UtStrings {
     public static final String NEWLINE_REGEX = "\\r?\\n";
     public static final String NUMBERS_REGEX = "\\d+";
 
-    public static String[] splitCommaSeparatedString(String csv) {
+    public static String[] splitCommaSeparatedString(final String csv) {
         return csv.replaceAll(NEWLINE_REGEX, "").split(",");
     }
 
-    public static void print(Object objToPrint) {
+    public static void print(final Object objToPrint) {
         System.out.print(objToPrint);
     }
 
@@ -25,7 +25,7 @@ public class UtStrings {
         System.out.println();
     }
 
-    public static void println(Object objToPrint) {
+    public static void println(final Object objToPrint) {
         System.out.println(objToPrint);
     }
 
@@ -38,15 +38,23 @@ public class UtStrings {
         }
     }
 
-    public static String[] splitMultilineString(String multiline) {
+    public static String[] splitMultilineString(final String multiline) {
         return multiline.replaceAll(NEWLINE_REGEX, "\n").split("\n");
     }
 
-    public static Stream<String> streamInputAsLines(String input) {
+    public static Stream<String> streamInputAsLines(final String input) {
         return Arrays.stream(splitMultilineString(input));
     }
 
-    public static String[] splitStringWithEmptyLines(String emptyLineSeparatedString) {
+    public static String[] splitStringWithEmptyLines(final String emptyLineSeparatedString) {
         return emptyLineSeparatedString.replaceAll(NEWLINE_REGEX, "\n").split("\n\n");
+    }
+
+    public static String substringUntilDelimiter(final String string, final String delimiter) {
+        final int indexOfDelimiter = string.indexOf(delimiter);
+        if (indexOfDelimiter == -1) {
+            return string;
+        }
+        return string.substring(0, indexOfDelimiter);
     }
 }
