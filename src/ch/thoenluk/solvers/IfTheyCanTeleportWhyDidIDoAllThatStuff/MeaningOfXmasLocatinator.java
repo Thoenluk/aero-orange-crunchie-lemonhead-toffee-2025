@@ -16,7 +16,6 @@ public class MeaningOfXmasLocatinator implements ChristmasSaver {
     private static final Character M = 'M';
     private static final Character A = 'A';
     private static final Character S = 'S';
-    private static final List<Position> CARDINAL_CROSS_NEIGHBOURS = List.of(Position.UP, Position.LEFT);
     private static final List<Position> DIAGONAL_CROSS_NEIGHBOURS = List.of(Position.UP_LEFT, Position.UP_RIGHT);
 
     @Override
