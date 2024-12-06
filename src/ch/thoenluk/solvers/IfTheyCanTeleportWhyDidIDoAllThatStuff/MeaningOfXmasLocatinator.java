@@ -25,7 +25,7 @@ public class MeaningOfXmasLocatinator implements ChristmasSaver {
     }
 
     private String findXmases(final Map<Position, Character> grid) {
-        return UtMath.restOfTheLongOwl(findPositionsWithValue(grid, X) //
+        return UtMath.restOfTheLongOwl(UtParsing.findPositionsWithValueInMap(grid, X) //
                 .map(position -> findNumberOfMasFrom(position, grid)));
     }
 
@@ -62,7 +62,7 @@ public class MeaningOfXmasLocatinator implements ChristmasSaver {
     }
 
     private String findCrossedMases(final Map<Position, Character> grid) {
-        return Long.toString(findPositionsWithValue(grid, A)
+        return Long.toString(UtParsing.findPositionsWithValueInMap(grid, A)
                 .filter(position -> isCenterOfCrossedMas(grid, position))
                 .count());
     }

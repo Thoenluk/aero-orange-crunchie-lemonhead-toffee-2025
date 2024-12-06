@@ -1,6 +1,7 @@
 package ch.thoenluk.ut;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class UtParsing {
     private static final Map<String, Integer> STRING_INTEGER_CACHE = new HashMap<>();
@@ -110,5 +111,11 @@ public class UtParsing {
         return Arrays.stream(wss.split(UtStrings.WHITE_SPACE_REGEX))
                 .map(UtParsing::cachedParseLong)
                 .toList();
+    }
+
+    public static <T> Stream<Position> findPositionsWithValueInMap(final Map<Position, T> map, final T value) {
+        return map.entrySet().stream()
+                .filter(entry -> value.equals(entry.getValue()))
+                .map(Map.Entry::getKey);
     }
 }

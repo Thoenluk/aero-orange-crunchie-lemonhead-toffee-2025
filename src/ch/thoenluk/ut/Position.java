@@ -38,6 +38,20 @@ public record Position(int y, int x) {
         );
     }
 
+    public boolean isInDirectionOf(final Position other, final Position direction) {
+        return isInDirectionOfSingleCoordinate(y(), other.y(), direction.y())
+                && isInDirectionOfSingleCoordinate(x(), other.x(), direction.x());
+    }
+
+    private boolean isInDirectionOfSingleCoordinate(final int coordinateOfThis, final int coordinateOfOther, final int coordinateOfDirection) {
+        if (coordinateOfDirection == 0) {
+            return coordinateOfThis == coordinateOfOther;
+        }
+        final int distance = coordinateOfThis - coordinateOfOther;
+        return Math.round(Math.signum(distance)) == Math.round(Math.signum(coordinateOfDirection))
+            && distance % coordinateOfDirection == 0;
+    }
+
     public List<Position> getNeighbours(final NeighbourDirection neighbourDirection) {
         final List<Position> neighbours = new LinkedList<>();
         for (final Position direction : neighbourDirection.getDirections()) {
