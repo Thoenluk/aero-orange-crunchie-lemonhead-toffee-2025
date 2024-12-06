@@ -5,20 +5,20 @@ import java.util.List;
 
 public record Position(int y, int x) {
 
-    public static Position UP = new Position(-1, 0);
-    public static Position DOWN = new Position(1, 0);
-    public static Position LEFT = new Position(0, -1);
-    public static Position RIGHT = new Position(0, 1);
-    public static Position UP_LEFT = new Position(-1, -1);
-    public static Position UP_RIGHT = new Position(-1, 1);
-    public static Position DOWN_LEFT = new Position(1, -1);
-    public static Position DOWN_RIGHT = new Position(1, 1);
-    public static Position SELF = new Position(0, 0);
+    public static final Position UP = new Position(-1, 0);
+    public static final Position DOWN = new Position(1, 0);
+    public static final Position LEFT = new Position(0, -1);
+    public static final Position RIGHT = new Position(0, 1);
+    public static final Position UP_LEFT = new Position(-1, -1);
+    public static final Position UP_RIGHT = new Position(-1, 1);
+    public static final Position DOWN_LEFT = new Position(1, -1);
+    public static final Position DOWN_RIGHT = new Position(1, 1);
+    public static final Position SELF = new Position(0, 0);
 
 
     //---- Static Methods
 
-    public static Position fromString(String description) {
+    public static Position fromString(final String description) {
         final String[] coordinates = UtStrings.splitCommaSeparatedString(description);
         return new Position(UtParsing.cachedParseInt(coordinates[1]), UtParsing.cachedParseInt(coordinates[0]));
     }
@@ -26,21 +26,21 @@ public record Position(int y, int x) {
 
     //---- Methods
 
-    public int getDistanceFrom(Position other) {
+    public int getDistanceFrom(final Position other) {
         return Math.abs(x() - other.x())
                 + Math.abs(y() - other.y());
     }
 
-    public int getRoleplayingDistanceFrom(Position other) {
+    public int getRoleplayingDistanceFrom(final Position other) {
         return Math.max(
                 Math.abs(x() - other.x()),
                 Math.abs(y() - other.y())
         );
     }
 
-    public List<Position> getNeighbours(NeighbourDirection neighbourDirection) {
-        List<Position> neighbours = new LinkedList<>();
-        for (Position direction : neighbourDirection.getDirections()) {
+    public List<Position> getNeighbours(final NeighbourDirection neighbourDirection) {
+        final List<Position> neighbours = new LinkedList<>();
+        for (final Position direction : neighbourDirection.getDirections()) {
             neighbours.add(offsetBy(direction));
         }
         return neighbours;
@@ -50,15 +50,27 @@ public record Position(int y, int x) {
         return getNeighbours(NeighbourDirection.CARDINAL);
     }
 
+    public List<Position> getDiagonalNeighbours() {
+        return getNeighbours(NeighbourDirection.DIAGONAL);
+    }
+
     public List<Position> getOmnidirectionalNeighbours() {
         return getNeighbours(NeighbourDirection.OMNIDIRECTIONAL);
+    }
+
+    public Position invert() {
+        return multiply(-1);
+    }
+
+    public Position multiply(final int multiplier) {
+        return new Position(y() * multiplier, x() * multiplier);
     }
 
     public Position offsetBy(final int y, final int x) {
         return offsetBy(new Position(y, x));
     }
 
-    public Position offsetBy(Position offset) {
+    public Position offsetBy(final Position offset) {
         return new Position(this.y + offset.y(), this.x + offset.x());
     }
 
@@ -73,15 +85,15 @@ public record Position(int y, int x) {
         return x() - other.x();
     }
 
-    public List<Position> offsetBy(List<Position> offsets) {
+    public List<Position> offsetBy(final List<Position> offsets) {
         final List<Position> offsetPositions = new LinkedList<>();
-        for (Position offset : offsets) {
+        for (final Position offset : offsets) {
             offsetPositions.add(offsetBy(offset));
         }
         return offsetPositions;
     }
 
-    public List<Position> getPathTo(Position other) {
+    public List<Position> getPathTo(final Position other) {
         final List<Position> path = new LinkedList<>();
         final Position offset = new Position(other.y() - y(), other.x() - x());
 
@@ -125,7 +137,7 @@ public record Position(int y, int x) {
 
         private final List<Position> directions;
 
-        /* private */ NeighbourDirection(List<Position> directions) {
+        /* private */ NeighbourDirection(final List<Position> directions) {
             this.directions = directions;
         }
 

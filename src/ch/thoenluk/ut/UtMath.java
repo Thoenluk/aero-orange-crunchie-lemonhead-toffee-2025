@@ -85,6 +85,10 @@ public class UtMath {
         return numbers.stream().reduce(numbers.getFirst(), UtMath::lcm);
     }
 
+    public static boolean isBetweenInclusive(final int testee, final int minimum, final int maximum) {
+        return minimum <= testee && testee <= maximum;
+    }
+
     public static String restOfTheOwl(final Stream<Integer> stream) {
         return stream.reduce(UtMath::overflowSafeSum)
                 .orElseThrow()
