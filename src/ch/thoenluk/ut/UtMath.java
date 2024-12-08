@@ -6,6 +6,8 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 public class UtMath {
+    private static final double LOG_10_BASE_SWAP = 1D / Math.log(10);
+
     public static int overflowSafeSum(final int... summands) {
         int result = 0;
         for (final int summand : summands) {
@@ -83,6 +85,14 @@ public class UtMath {
 
     public static long lcm(final List<Long> numbers) {
         return numbers.stream().reduce(numbers.getFirst(), UtMath::lcm);
+    }
+
+    public static int orderOfMagnitude(final long number) {
+        return (int) Math.floor(Math.log(number) * LOG_10_BASE_SWAP);
+    }
+
+    public static long power(final long base, final long exponent) {
+        return (long) Math.pow(base, exponent);
     }
 
     public static boolean isBetweenInclusive(final int testee, final int minimum, final int maximum) {

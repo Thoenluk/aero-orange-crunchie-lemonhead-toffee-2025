@@ -81,12 +81,6 @@ public class CreedAssassinator implements ChristmasSaver {
     private Set<Position> findObstacleLocations(Position guardPosition, final List<Position> obstacles, final Map<Position, Character> map) {
         final Set<Position> visitedPositions = new HashSet<>();
         visitedPositions.add(guardPosition);
-        final Map<Position, Set<Position>> turningPoints = new HashMap<>(Map.of(
-                UP, new HashSet<>(),
-                RIGHT, new HashSet<>(),
-                DOWN, new HashSet<>(),
-                LEFT, new HashSet<>()
-        ));
         final Set<Position> potentialObstacleLocations = new HashSet<>();
         Position direction = UP;
         Optional<Position> spaceBeforeNextObstacle;
@@ -95,26 +89,25 @@ public class CreedAssassinator implements ChristmasSaver {
             if (spaceBeforeNextObstacle.isPresent()) {
                 final Position spaceBeforeObstacle = spaceBeforeNextObstacle.get();
                 final List<Position> path = guardPosition.getPathTo(spaceBeforeObstacle);
-                turningPoints.get(direction).add(spaceBeforeObstacle);
                 final Position nextDirection = TURN_RIGHT.get(direction);
-                potentialObstacleLocations.addAll(findPotentialObstacleLocationsOnPath(direction, turningPoints, path, visitedPositions, obstacles));
+                potentialObstacleLocations.addAll(findPotentialObstacleLocationsOnPath(direction, path, visitedPositions, obstacles));
                 visitedPositions.addAll(path);
                 guardPosition = spaceBeforeObstacle;
                 direction = nextDirection;
             }
             else {
                 final List<Position> pathToEdge = getPathToEdge(map, guardPosition, direction);
-                potentialObstacleLocations.addAll(findPotentialObstacleLocationsOnPath(direction, turningPoints, pathToEdge, visitedPositions, obstacles));
+                potentialObstacleLocations.addAll(findPotentialObstacleLocationsOnPath(direction, pathToEdge, visitedPositions, obstacles));
             }
         } while (spaceBeforeNextObstacle.isPresent());
         return potentialObstacleLocations;
     }
 
-    private List<Position> findPotentialObstacleLocationsOnPath(final Position direction, final Map<Position, Set<Position>> turningPoints, final List<Position> pathToEdge, final Set<Position> visitedPositions, final List<Position> obstacles) {
+    private List<Position> findPotentialObstacleLocationsOnPath(final Position direction, final List<Position> pathToEdge, final Set<Position> visitedPositions, final List<Position> obstacles) {
         final Position nextDirection = TURN_RIGHT.get(direction);
         return pathToEdge.parallelStream()
                 .filter(space -> canPlaceObstacleWithoutParadox(visitedPositions, direction, space))
-                .filter(space -> wouldCreateLoopTurningIn(space, obstacles, space.offsetBy(direction), turningPoints, nextDirection))
+                .filter(space -> wouldCreateLoopTurningIn(space, obstacles, space.offsetBy(direction), nextDirection))
                 .map(space -> space.offsetBy(direction))
                 .toList();
     }
@@ -123,7 +116,7 @@ public class CreedAssassinator implements ChristmasSaver {
         return !visitedPositions.contains(space.offsetBy(direction));
     }
 
-    private boolean wouldCreateLoopTurningIn(Position guardPosition, final List<Position> obstacles, final Position newObstacle, final Map<Position, Set<Position>> turningPoints, final Position startingDirection) {
+    private boolean wouldCreateLoopTurningIn(Position guardPosition, final List<Position> obstacles, final Position newObstacle, final Position startingDirection) {
         final List<Position> subObstacles = new LinkedList<>(obstacles);
         subObstacles.add(newObstacle);
         final Map<Position, Set<Position>> subTurningPoints = Map.of(

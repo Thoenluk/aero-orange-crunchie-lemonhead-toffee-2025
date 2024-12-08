@@ -100,6 +100,12 @@ public class UtParsing {
         return parsedList;
     }
 
+    public static List<Integer> whitespaceSeparatedStringToIntegerList(final String wss) {
+        return Arrays.stream(wss.split(UtStrings.WHITE_SPACE_REGEX))
+                .map(UtParsing::cachedParseInt)
+                .toList();
+    }
+
     public static List<Long> commaSeparatedStringToLongList(final String csv) {
         return Arrays.stream(UtStrings.splitCommaSeparatedString(csv))
                 .map(String::trim)

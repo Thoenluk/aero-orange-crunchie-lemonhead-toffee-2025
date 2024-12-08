@@ -8,7 +8,6 @@ import ch.thoenluk.ut.UtParsing;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 @Day(4)
 public class MeaningOfXmasLocatinator implements ChristmasSaver {
@@ -27,12 +26,6 @@ public class MeaningOfXmasLocatinator implements ChristmasSaver {
     private String findXmases(final Map<Position, Character> grid) {
         return UtMath.restOfTheLongOwl(UtParsing.findPositionsWithValueInMap(grid, X) //
                 .map(position -> findNumberOfMasFrom(position, grid)));
-    }
-
-    private static Stream<Position> findPositionsWithValue(final Map<Position, Character> grid, final Character value) {
-        return grid.entrySet().parallelStream() //
-                .filter(entry -> value.equals(entry.getValue())) //
-                .map(Map.Entry::getKey);
     }
 
     private long findNumberOfMasFrom(final Position start, final Map<Position, Character> grid) {
