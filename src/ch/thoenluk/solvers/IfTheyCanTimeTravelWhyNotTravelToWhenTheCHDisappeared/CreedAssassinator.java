@@ -3,6 +3,7 @@ package ch.thoenluk.solvers.IfTheyCanTimeTravelWhyNotTravelToWhenTheCHDisappeare
 import ch.thoenluk.ChristmasSaver;
 import ch.thoenluk.Day;
 import ch.thoenluk.ut.Position;
+import ch.thoenluk.ut.UtCollections;
 import ch.thoenluk.ut.UtParsing;
 
 import java.util.*;
@@ -27,10 +28,10 @@ public class CreedAssassinator implements ChristmasSaver {
     @Override
     public String saveChristmas(final String input) {
         final Map<Position, Character> map = UtParsing.multilineStringToPositionCharacterMap(input); // heh, map.
-        Position guardPosition = UtParsing.findPositionsWithValueInMap(map, '^')
+        Position guardPosition = UtCollections.findPositionsWithValueInMap(map, '^')
                 .findFirst()
                 .orElseThrow();
-        final List<Position> obstacles = UtParsing.findPositionsWithValueInMap(map, '#').toList();
+        final List<Position> obstacles = UtCollections.findPositionsWithValueInMap(map, '#').toList();
         final Set<Position> visitedPositions = new HashSet<>();
         visitedPositions.add(guardPosition);
         Position direction = UP;
@@ -70,10 +71,10 @@ public class CreedAssassinator implements ChristmasSaver {
     @Override
     public String saveChristmasAgain(final String input) {
         final Map<Position, Character> map = UtParsing.multilineStringToPositionCharacterMap(input); // heh, map.
-        final Position guardPosition = UtParsing.findPositionsWithValueInMap(map, '^')
+        final Position guardPosition = UtCollections.findPositionsWithValueInMap(map, '^')
                 .findFirst()
                 .orElseThrow();
-        final List<Position> obstacles = UtParsing.findPositionsWithValueInMap(map, '#').toList();
+        final List<Position> obstacles = UtCollections.findPositionsWithValueInMap(map, '#').toList();
         final Set<Position> potentialObstacleLocations = findObstacleLocations(guardPosition, obstacles, map);
         return Integer.toString(potentialObstacleLocations.size());
     }

@@ -109,7 +109,7 @@ public record Position(int y, int x) {
 
     public List<Position> getPathTo(final Position other) {
         final List<Position> path = new LinkedList<>();
-        final Position offset = new Position(other.y() - y(), other.x() - x());
+        final Position offset = getOffsetTo(other);
 
         if (
                 !(
@@ -131,6 +131,28 @@ public record Position(int y, int x) {
         }
 
         return path;
+    }
+
+    public Position getOffsetTo(final Position other) {
+        return new Position(other.y() - this.y(), other.x() - this.x());
+    }
+
+    public Position mirrorOn(final Position other) {
+        return other.offsetBy(getOffsetTo(other));
+    }
+
+    public List<Position> mirrorOnUntilMaxCoordinate(final Position other, final int maxCoordinate) {
+        final List<Position> result = new LinkedList<>();
+        final Position offset = getOffsetTo(other);
+        Position mirrored = other;
+        while (mirrored.x() >= 0
+                && mirrored.x() <= maxCoordinate
+                && mirrored.y() >= 0
+                && mirrored.y() <= maxCoordinate) {
+            result.add(mirrored);
+            mirrored = mirrored.offsetBy(offset);
+        }
+        return result;
     }
 
 

@@ -3,6 +3,7 @@ package ch.thoenluk.solvers.IfTheyCanTeleportWhyDidIDoAllThatStuff;
 import ch.thoenluk.ChristmasSaver;
 import ch.thoenluk.Day;
 import ch.thoenluk.ut.Position;
+import ch.thoenluk.ut.UtCollections;
 import ch.thoenluk.ut.UtMath;
 import ch.thoenluk.ut.UtParsing;
 
@@ -24,7 +25,7 @@ public class MeaningOfXmasLocatinator implements ChristmasSaver {
     }
 
     private String findXmases(final Map<Position, Character> grid) {
-        return UtMath.restOfTheLongOwl(UtParsing.findPositionsWithValueInMap(grid, X) //
+        return UtMath.restOfTheLongOwl(UtCollections.findPositionsWithValueInMap(grid, X) //
                 .map(position -> findNumberOfMasFrom(position, grid)));
     }
 
@@ -55,7 +56,7 @@ public class MeaningOfXmasLocatinator implements ChristmasSaver {
     }
 
     private String findCrossedMases(final Map<Position, Character> grid) {
-        return Long.toString(UtParsing.findPositionsWithValueInMap(grid, A)
+        return Long.toString(UtCollections.findPositionsWithValueInMap(grid, A)
                 .filter(position -> isCenterOfCrossedMas(grid, position))
                 .count());
     }
