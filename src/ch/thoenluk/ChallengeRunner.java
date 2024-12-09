@@ -13,7 +13,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.StructuredTaskScope;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
@@ -28,9 +28,10 @@ public class ChallengeRunner {
     private final static Scanner USER_INPUT = new Scanner(System.in);
     private final static String FIRST_CHALLENGE_SUFFIX = "1";
     private final static String SECOND_CHALLENGE_SUFFIX = "2";
+    public static final int NANO_TO_MILLI = 1_000_000;
     private final List<? extends Class<? extends ChristmasSaver>> christmasSaverClasses = findChristmasSaverClasses();
     private Supplier<int[]> daySelectionStrategy = this::getSelectedChallengeFromUser;
-    private Consumer<Integer> executionStrategy = this::testAndRunChristmasSaver;
+    private Function<Integer, Long> executionStrategy = this::testAndRunChristmasSaver;
     private int[] argsChallenges = null;
 
     public void main(final String[] args) {
@@ -92,9 +93,11 @@ public class ChallengeRunner {
 
     private void executeChristmasSavers() {
         final int[] challenges = daySelectionStrategy.get();
-        final long startTime = System.currentTimeMillis();
-        Arrays.stream(challenges).forEach(executionStrategy::accept);
-        println(STR."Took a total of \{System.currentTimeMillis() - startTime}ms for it all!");
+        final long executionTime = Arrays.stream(challenges)
+                .mapToObj(executionStrategy::apply)
+                .reduce(Long::sum)
+                .orElseThrow();
+        println(STR."Took a total of \{executionTime / NANO_TO_MILLI}ms for it all!");
     }
 
     private int[] selectMostRecentChallenge() {
@@ -126,27 +129,27 @@ public class ChallengeRunner {
         return new int[]{selectedChallenge};
     }
 
-    private void testAndRunChristmasSaver(final int selectedChallenge) {
+    private long testAndRunChristmasSaver(final int selectedChallenge) {
         final ChristmasSavingPackage result = wrapChristmasSavingPackage(selectedChallenge);
 
         println("Running first challenge...");
         testChristmasSaver(result.challengeFolder(), result.christmasSaver()::saveChristmas, FIRST_CHALLENGE_SUFFIX);
-        runChristmasSaver(result.christmasSaver()::saveChristmas, result.input());
+        final long timeForFirst = runChristmasSaver(result.christmasSaver()::saveChristmas, result.input());
         println("What fun that was. Running second challenge...");
         testChristmasSaver(result.challengeFolder(), result.christmasSaver()::saveChristmasAgain, SECOND_CHALLENGE_SUFFIX);
-        runChristmasSaver(result.christmasSaver()::saveChristmasAgain, result.input());
+        return timeForFirst + runChristmasSaver(result.christmasSaver()::saveChristmasAgain, result.input());
     }
 
-    private void onlyRunChristmasSaver(final int selectedChallenge) {
+    private long onlyRunChristmasSaver(final int selectedChallenge) {
         final ChristmasSavingPackage result = wrapChristmasSavingPackage(selectedChallenge);
-        runChristmasSaver(result.christmasSaver()::saveChristmas, result.input());
+        return runChristmasSaver(result.christmasSaver()::saveChristmas, result.input()) +
         runChristmasSaver(result.christmasSaver()::saveChristmasAgain, result.input());
     }
 
-    private void onlyTestAndRunSecondChallenge(final int selectedChallenge) {
+    private long onlyTestAndRunSecondChallenge(final int selectedChallenge) {
         final ChristmasSavingPackage result = wrapChristmasSavingPackage(selectedChallenge);
         testChristmasSaver(result.challengeFolder(), result.christmasSaver()::saveChristmasAgain, SECOND_CHALLENGE_SUFFIX);
-        runChristmasSaver(result.christmasSaver()::saveChristmasAgain, result.input());
+        return runChristmasSaver(result.christmasSaver()::saveChristmasAgain, result.input());
     }
 
     private ChristmasSavingPackage wrapChristmasSavingPackage(final int selectedChallenge) {
@@ -170,11 +173,13 @@ public class ChallengeRunner {
         return UtStrings.readFile(actualInputFiles[0]);
     }
 
-    private static void runChristmasSaver(final UnaryOperator<String> savingMethod, final String input) {
+    private static long runChristmasSaver(final UnaryOperator<String> savingMethod, final String input) {
         println("Determined the result for the challenge is:");
-        final long millisBeforeStart = System.currentTimeMillis();
+        final long nanosBeforeStart = System.nanoTime();
         println(savingMethod.apply(input));
-        println(STR."And did it in \{System.currentTimeMillis() - millisBeforeStart}ms!");
+        final long executionTime = System.nanoTime() - nanosBeforeStart;
+        println(STR."And did it in \{executionTime / NANO_TO_MILLI}ms!");
+        return executionTime;
     }
 
     // I do not fear what this method does; I fear what kind of further automation I'll think up next year.

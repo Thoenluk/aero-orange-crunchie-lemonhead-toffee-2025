@@ -33,6 +33,9 @@ public class UtMath {
     public static int overflowSafeProduct(final int... multiplicands) {
         int result = 1;
         for (final int multiplicand : multiplicands) {
+            if (multiplicand == 0) {
+                return 0;
+            }
             if (Integer.MAX_VALUE / result <= multiplicand) {
                 throw new AssertionError("Product would overflow! Use a long instead.");
             }
@@ -44,6 +47,9 @@ public class UtMath {
     public static long superOverflowSafeProduct(final long... multiplicands) {
         long result = 1;
         for (final long multiplicand : multiplicands) {
+            if (multiplicand == 0) {
+                return 0;
+            }
             if (Long.MAX_VALUE / result <= multiplicand) {
                 throw new AssertionError("Product would overflow! Panic.");
             }
@@ -95,8 +101,8 @@ public class UtMath {
         return (long) Math.pow(base, exponent);
     }
 
-    public static boolean isBetweenInclusive(final int testee, final int minimum, final int maximum) {
-        return minimum <= testee && testee <= maximum;
+    public static long triangularNumber(final long n) {
+        return superOverflowSafeProduct(n, n + 1) / 2;
     }
 
     public static String restOfTheOwl(final Stream<Integer> stream) {
