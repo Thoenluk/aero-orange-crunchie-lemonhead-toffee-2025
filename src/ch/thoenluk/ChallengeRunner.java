@@ -23,6 +23,8 @@ import static ch.thoenluk.ut.UtStrings.println;
 
 /**
  * @author Lukas Thöni lukas.thoeni@gmx.ch
+ * A note to any current or future employers: This class is where I experiment each year to see how fancy I can make it.
+ * Please see other classes for examples of how I would actually write productive code.
  */
 public class ChallengeRunner {
     private final static Scanner USER_INPUT = new Scanner(System.in);
@@ -97,6 +99,7 @@ public class ChallengeRunner {
                 .mapToObj(executionStrategy::apply)
                 .reduce(Long::sum)
                 .orElseThrow();
+        // TODO: Collect execution times into a List and print fancy stats if there's more than two: Average, median
         println(STR."Took a total of \{executionTime / NANO_TO_MILLI}ms for it all!");
     }
 

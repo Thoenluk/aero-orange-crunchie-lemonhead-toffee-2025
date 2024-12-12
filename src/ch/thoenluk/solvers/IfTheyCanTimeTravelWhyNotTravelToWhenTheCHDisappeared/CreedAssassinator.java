@@ -7,6 +7,7 @@ import ch.thoenluk.ut.UtCollections;
 import ch.thoenluk.ut.UtParsing;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ch.thoenluk.ut.Position.*;
 
@@ -31,7 +32,7 @@ public class CreedAssassinator implements ChristmasSaver {
         Position guardPosition = UtCollections.findPositionsWithValueInMap(map, '^')
                 .findFirst()
                 .orElseThrow();
-        final List<Position> obstacles = UtCollections.findPositionsWithValueInMap(map, '#').toList();
+        final Set<Position> obstacles = UtCollections.findPositionsWithValueInMap(map, '#').collect(Collectors.toSet());
         final Set<Position> visitedPositions = new HashSet<>();
         visitedPositions.add(guardPosition);
         Position direction = UP;
@@ -61,7 +62,7 @@ public class CreedAssassinator implements ChristmasSaver {
         return pathToEdge;
     }
 
-    private static Optional<Position> findSpaceBeforeNextObstacle(final List<Position> obstacles, final Position guardPosition, final Position direction) {
+    private static Optional<Position> findSpaceBeforeNextObstacle(final Set<Position> obstacles, final Position guardPosition, final Position direction) {
         return obstacles.stream()
                 .filter(obstacle -> obstacle.isInDirectionOf(guardPosition, direction))
                 .min(Comparator.comparing(guardPosition::getDistanceFrom))
@@ -74,12 +75,12 @@ public class CreedAssassinator implements ChristmasSaver {
         final Position guardPosition = UtCollections.findPositionsWithValueInMap(map, '^')
                 .findFirst()
                 .orElseThrow();
-        final List<Position> obstacles = UtCollections.findPositionsWithValueInMap(map, '#').toList();
+        final Set<Position> obstacles = UtCollections.findPositionsWithValueInMap(map, '#').collect(Collectors.toSet());
         final Set<Position> potentialObstacleLocations = findObstacleLocations(guardPosition, obstacles, map);
         return Integer.toString(potentialObstacleLocations.size());
     }
 
-    private Set<Position> findObstacleLocations(Position guardPosition, final List<Position> obstacles, final Map<Position, Character> map) {
+    private Set<Position> findObstacleLocations(Position guardPosition, final Set<Position> obstacles, final Map<Position, Character> map) {
         final Set<Position> visitedPositions = new HashSet<>();
         visitedPositions.add(guardPosition);
         final Set<Position> potentialObstacleLocations = new HashSet<>();
@@ -104,7 +105,7 @@ public class CreedAssassinator implements ChristmasSaver {
         return potentialObstacleLocations;
     }
 
-    private List<Position> findPotentialObstacleLocationsOnPath(final Position direction, final List<Position> pathToEdge, final Set<Position> visitedPositions, final List<Position> obstacles) {
+    private List<Position> findPotentialObstacleLocationsOnPath(final Position direction, final List<Position> pathToEdge, final Set<Position> visitedPositions, final Set<Position> obstacles) {
         final Position nextDirection = TURN_RIGHT.get(direction);
         return pathToEdge.parallelStream()
                 .filter(space -> canPlaceObstacleWithoutParadox(visitedPositions, direction, space))
@@ -117,8 +118,8 @@ public class CreedAssassinator implements ChristmasSaver {
         return !visitedPositions.contains(space.offsetBy(direction));
     }
 
-    private boolean wouldCreateLoopTurningIn(Position guardPosition, final List<Position> obstacles, final Position newObstacle, final Position startingDirection) {
-        final List<Position> subObstacles = new LinkedList<>(obstacles);
+    private boolean wouldCreateLoopTurningIn(Position guardPosition, final Set<Position> obstacles, final Position newObstacle, final Position startingDirection) {
+        final Set<Position> subObstacles = new HashSet<>(obstacles);
         subObstacles.add(newObstacle);
         final Map<Position, Set<Position>> subTurningPoints = Map.of(
                 UP, new HashSet<>(),
