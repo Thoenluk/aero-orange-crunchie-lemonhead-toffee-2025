@@ -97,6 +97,10 @@ public class UtMath {
         return (int) Math.floor(Math.log(number) * LOG_10_BASE_SWAP);
     }
 
+    public static boolean isDivisibleBy(final long dividend, final long divisor) {
+        return dividend % divisor == 0;
+    }
+
     public static long power(final long base, final long exponent) {
         return (long) Math.pow(base, exponent);
     }
