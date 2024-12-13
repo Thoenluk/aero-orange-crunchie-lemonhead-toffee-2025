@@ -2,9 +2,9 @@ package ch.thoenluk.ut;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public record Position(int y, int x) {
-
     public static final Position UP = new Position(-1, 0);
     public static final Position DOWN = new Position(1, 0);
     public static final Position LEFT = new Position(0, -1);
@@ -14,6 +14,20 @@ public record Position(int y, int x) {
     public static final Position DOWN_LEFT = new Position(1, -1);
     public static final Position DOWN_RIGHT = new Position(1, 1);
     public static final Position SELF = new Position(0, 0);
+
+    private static final Map<Position, Position> TURN_RIGHT = Map.of(
+            UP, RIGHT,
+            RIGHT, DOWN,
+            DOWN, LEFT,
+            LEFT, UP
+    );
+
+    private static final Map<Position, Position> TURN_LEFT = Map.of(
+            RIGHT, UP,
+            DOWN, RIGHT,
+            LEFT, DOWN,
+            UP, LEFT
+    );
 
 
     //---- Static Methods
@@ -36,6 +50,10 @@ public record Position(int y, int x) {
                 Math.abs(x() - other.x()),
                 Math.abs(y() - other.y())
         );
+    }
+
+    public boolean isCardinalNeighbour(final Position other) {
+        return getDistanceFrom(other) == 1;
     }
 
     public boolean isInDirectionOf(final Position other, final Position direction) {
@@ -139,6 +157,20 @@ public record Position(int y, int x) {
 
     public Position mirrorOn(final Position other) {
         return other.offsetBy(getOffsetTo(other));
+    }
+
+    public Position turnRight() {
+        if (!TURN_RIGHT.containsKey(this)) {
+            throw new AssertionError("Idiot has to bother re-implementing proper turning :<");
+        }
+        return TURN_RIGHT.get(this);
+    }
+
+    public Position turnLeft() {
+        if (!TURN_LEFT.containsKey(this)) {
+            throw new AssertionError("Idiot has to bother re-implementing proper turning :<");
+        }
+        return TURN_LEFT.get(this);
     }
 
     public List<Position> mirrorOnUntilMaxCoordinate(final Position other, final int maxCoordinate) {

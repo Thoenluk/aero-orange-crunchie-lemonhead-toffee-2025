@@ -19,13 +19,6 @@ public class CreedAssassinator implements ChristmasSaver {
     // perfectly legible methods with sensible names and good practices like final-only variables.
     // I will do precisely none of that for lack of time and intent.
 
-    private static final Map<Position, Position> TURN_RIGHT = Map.of(
-            UP, RIGHT,
-            RIGHT, DOWN,
-            DOWN, LEFT,
-            LEFT, UP
-    );
-
     @Override
     public String saveChristmas(final String input) {
         final Map<Position, Character> map = UtParsing.multilineStringToPositionCharacterMap(input); // heh, map.
@@ -43,7 +36,7 @@ public class CreedAssassinator implements ChristmasSaver {
                 final List<Position> path = guardPosition.getPathTo(spaceBeforeNextObstacle.get());
                 visitedPositions.addAll(path);
                 guardPosition = path.getLast();
-                direction = TURN_RIGHT.get(direction);
+                direction = direction.turnRight();
             }
             else {
                 visitedPositions.addAll(getPathToEdge(map, guardPosition, direction));
@@ -91,7 +84,7 @@ public class CreedAssassinator implements ChristmasSaver {
             if (spaceBeforeNextObstacle.isPresent()) {
                 final Position spaceBeforeObstacle = spaceBeforeNextObstacle.get();
                 final List<Position> path = guardPosition.getPathTo(spaceBeforeObstacle);
-                final Position nextDirection = TURN_RIGHT.get(direction);
+                final Position nextDirection = direction.turnRight();
                 potentialObstacleLocations.addAll(findPotentialObstacleLocationsOnPath(direction, path, visitedPositions, obstacles));
                 visitedPositions.addAll(path);
                 guardPosition = spaceBeforeObstacle;
@@ -106,7 +99,7 @@ public class CreedAssassinator implements ChristmasSaver {
     }
 
     private List<Position> findPotentialObstacleLocationsOnPath(final Position direction, final List<Position> pathToEdge, final Set<Position> visitedPositions, final Set<Position> obstacles) {
-        final Position nextDirection = TURN_RIGHT.get(direction);
+        final Position nextDirection = direction.turnRight();
         return pathToEdge.parallelStream()
                 .filter(space -> canPlaceObstacleWithoutParadox(visitedPositions, direction, space))
                 .filter(space -> wouldCreateLoopTurningIn(space, obstacles, space.offsetBy(direction), nextDirection))
@@ -137,7 +130,7 @@ public class CreedAssassinator implements ChristmasSaver {
                     return true;
                 }
                 subTurningPoints.get(direction).add(spaceBeforeObstacle);
-                final Position nextDirection = TURN_RIGHT.get(direction);
+                final Position nextDirection = direction.turnRight();
                 guardPosition = spaceBeforeObstacle;
                 direction = nextDirection;
             } else {
