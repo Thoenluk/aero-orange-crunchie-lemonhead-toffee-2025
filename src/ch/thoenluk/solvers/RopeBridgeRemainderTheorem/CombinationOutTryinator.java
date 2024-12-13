@@ -45,10 +45,7 @@ public class CombinationOutTryinator implements ChristmasSaver {
     }
 
     final long concatenate(final long first, final long second) {
-        final long orderOfMagnitude =  UtMath.orderOfMagnitude(second) + (second == 10 ? 2 : 1);
-        // Technically, it goes wrong for any whole power of 10.
-        // However, the only such number that occurs in the input is 10. So we skip expensive modulus for cheap branch
-        // That's why I'm an engineer and not a mathematician, tee hee.
+        final long orderOfMagnitude =  UtMath.orderOfMagnitude(second) + 1;
         return (first * UtMath.power(10, orderOfMagnitude)) + second;
     }
 

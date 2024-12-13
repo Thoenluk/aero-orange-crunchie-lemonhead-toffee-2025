@@ -94,7 +94,9 @@ public class UtMath {
     }
 
     public static int orderOfMagnitude(final long number) {
-        return (int) Math.floor(Math.log(number) * LOG_10_BASE_SWAP);
+        return (int) Math.floor(Math.log(number + 1) * LOG_10_BASE_SWAP);
+        // Nothing like a horrible indefensible hack that works perfectly.
+        // That's why I'm an engineer and not a mathematician, tee hee.
     }
 
     public static boolean isDivisibleBy(final long dividend, final long divisor) {
