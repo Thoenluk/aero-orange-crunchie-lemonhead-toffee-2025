@@ -43,7 +43,7 @@ public class UtStrings {
     }
 
     public static Stream<String> streamInputAsLines(final String input) {
-        return Arrays.stream(splitMultilineString(input));
+        return input.lines();
     }
 
     public static String[] splitStringWithEmptyLines(final String emptyLineSeparatedString) {

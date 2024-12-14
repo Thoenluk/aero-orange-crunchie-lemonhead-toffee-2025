@@ -58,6 +58,11 @@ public class UtMath {
         return result;
     }
 
+    public static int modForNormalPeople(final int number, final int mod) {
+        final int modulated = number % mod;
+        return modulated < 0 ? modulated + mod : modulated;
+    }
+
     public static int wrap(int number, final int borderToWrapOn) {
         while (number < 1) {
             number += borderToWrapOn;

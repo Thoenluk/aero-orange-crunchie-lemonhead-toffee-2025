@@ -1,5 +1,6 @@
 package ch.thoenluk;
 
+import ch.thoenluk.ut.UtMath;
 import ch.thoenluk.ut.UtParsing;
 import ch.thoenluk.ut.UtStrings;
 
@@ -95,12 +96,21 @@ public class ChallengeRunner {
 
     private void executeChristmasSavers() {
         final int[] challenges = daySelectionStrategy.get();
-        final long executionTime = Arrays.stream(challenges)
+        final List<Long> executionTimes = Arrays.stream(challenges)
                 .mapToObj(executionStrategy::apply)
-                .reduce(Long::sum)
-                .orElseThrow();
-        // TODO: Collect execution times into a List and print fancy stats if there's more than two: Average, median
-        println(STR."Took a total of \{executionTime / NANO_TO_MILLI}ms for it all!");
+                .toList();
+        final long total = executionTimes.stream().reduce(0L, Long::sum);
+        final long average = total / executionTimes.size();
+        final List<Long> sorted = executionTimes.stream()
+                .sorted()
+                .toList();
+        final long median = sorted.get(sorted.size() / 2);
+        final long totalWithoutWorstOffenders = sorted.subList(0, (sorted.size() * 9) / 10).stream()
+                        .reduce(0L, Long::sum);
+        println(STR."""
+            Took a total of \{total / NANO_TO_MILLI}ms for it all!
+            Average runtime was \{average / NANO_TO_MILLI}ms with a median of \{median / NANO_TO_MILLI}ms.
+            If we ignore the 10% longest running challenges (that I don't care to optimise more), the total is \{totalWithoutWorstOffenders / NANO_TO_MILLI}ms!""");
     }
 
     private int[] selectMostRecentChallenge() {
@@ -146,7 +156,7 @@ public class ChallengeRunner {
     private long onlyRunChristmasSaver(final int selectedChallenge) {
         final ChristmasSavingPackage result = wrapChristmasSavingPackage(selectedChallenge);
         return runChristmasSaver(result.christmasSaver()::saveChristmas, result.input()) +
-        runChristmasSaver(result.christmasSaver()::saveChristmasAgain, result.input());
+                runChristmasSaver(result.christmasSaver()::saveChristmasAgain, result.input());
     }
 
     private long onlyTestAndRunSecondChallenge(final int selectedChallenge) {
