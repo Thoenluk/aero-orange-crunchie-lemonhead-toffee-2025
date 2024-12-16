@@ -51,8 +51,9 @@ public class UtParsing {
         final String[] lines = UtStrings.splitMultilineString(stringRepresentation);
 
         for (y = 0; y < lines.length; y++) {
-            for (x = 0; x < lines[y].length(); x++) {
-                map.put(new Position(y, x), lines[y].charAt(x));
+            final String line = lines[y];
+            for (x = 0; x < line.length(); x++) {
+                map.put(new Position(y, x), line.charAt(x));
             }
         }
 
