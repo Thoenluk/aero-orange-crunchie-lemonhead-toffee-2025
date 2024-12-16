@@ -1,6 +1,5 @@
 package ch.thoenluk;
 
-import ch.thoenluk.ut.UtMath;
 import ch.thoenluk.ut.UtParsing;
 import ch.thoenluk.ut.UtStrings;
 
@@ -100,17 +99,21 @@ public class ChallengeRunner {
                 .mapToObj(executionStrategy::apply)
                 .toList();
         final long total = executionTimes.stream().reduce(0L, Long::sum);
-        final long average = total / executionTimes.size();
-        final List<Long> sorted = executionTimes.stream()
-                .sorted()
-                .toList();
-        final long median = sorted.get(sorted.size() / 2);
-        final long totalWithoutWorstOffenders = sorted.subList(0, (sorted.size() * 9) / 10).stream()
-                        .reduce(0L, Long::sum);
-        println(STR."""
-            Took a total of \{total / NANO_TO_MILLI}ms for it all!
-            Average runtime was \{average / NANO_TO_MILLI}ms with a median of \{median / NANO_TO_MILLI}ms.
-            If we ignore the 10% longest running challenges (that I don't care to optimise more), the total is \{totalWithoutWorstOffenders / NANO_TO_MILLI}ms!""");
+        println(STR."Took a total of \{total / NANO_TO_MILLI}ms for it all!");
+        if (executionTimes.size() > 2) {
+            final long average = total / executionTimes.size();
+            final List<Long> sorted = executionTimes.stream()
+                    .sorted()
+                    .toList();
+            final long median = sorted.get(sorted.size() / 2);
+            final long totalWithoutWorstOffenders = sorted.subList(0, (sorted.size() * 9) / 10).stream()
+                    .reduce(0L, Long::sum);
+            final long averageWithoutWorstOffenders = totalWithoutWorstOffenders / ((sorted.size() * 9L) / 10L);
+            println(STR."""
+                Average runtime was \{average / NANO_TO_MILLI}ms with a median of \{median / NANO_TO_MILLI}ms.
+                If we ignore the 10% longest running challenges (that I don't care to optimise more), the total is \{totalWithoutWorstOffenders / NANO_TO_MILLI}ms!
+                (That's an average of only \{averageWithoutWorstOffenders / NANO_TO_MILLI}ms!)""");
+        }
     }
 
     private int[] selectMostRecentChallenge() {
