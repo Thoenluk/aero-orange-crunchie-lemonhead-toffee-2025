@@ -158,6 +158,7 @@ public class ChallengeRunner {
 
     private long onlyRunChristmasSaver(final int selectedChallenge) {
         final ChristmasSavingPackage result = wrapChristmasSavingPackage(selectedChallenge);
+        UtStrings.println(STR."Challenge \{selectedChallenge}:");
         return runChristmasSaver(result.christmasSaver()::saveChristmas, result.input()) +
                 runChristmasSaver(result.christmasSaver()::saveChristmasAgain, result.input());
     }
