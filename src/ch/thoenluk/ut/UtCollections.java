@@ -12,6 +12,10 @@ public class UtCollections {
                 .map(Map.Entry::getKey);
     }
 
+    public static <T> Position findSinglePositionWithValueInMap(final Map<Position, T> map, final T value) {
+        return findPositionsWithValueInMap(map, value).findAny().orElseThrow();
+    }
+
     public static <T> Stream<List<T>> streamPairwise(final List<T> list) {
         return IntStream.range(0, list.size())
                 .boxed()
