@@ -187,6 +187,23 @@ public record Position(int y, int x) {
         return result;
     }
 
+    public List<Position> findCardinalDirectionsLeadingTo(final Position other) {
+        final List<Position> result = new LinkedList<>();
+        if (other.y() < y()) {
+            result.add(UP);
+        }
+        else if (other.y() > y()) {
+            result.add(DOWN);
+        }
+        if (other.x() < x()) {
+            result.add(LEFT);
+        }
+        else if (other.x() > x()) {
+            result.add(RIGHT);
+        }
+        return result;
+    }
+
 
     //---- Inner enum
 
