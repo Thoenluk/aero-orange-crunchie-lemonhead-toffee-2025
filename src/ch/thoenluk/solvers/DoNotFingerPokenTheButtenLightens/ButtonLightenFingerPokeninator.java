@@ -51,13 +51,6 @@ public class ButtonLightenFingerPokeninator implements ChristmasSaver {
     private static final Position LEFT = new Position(5, 0);
     private static final Position DOWN = new Position(5, 1);
     private static final Position RIGHT = new Position(5, 2);
-    private static final Map<Position, Character> LABELS = Map.of(
-            UP, '^',
-            LEFT, '<',
-            DOWN, 'v',
-            RIGHT, '>',
-            DIRECTIONAL_A, 'A'
-    );
     private static final Map<Position, Position> DIRECTIONS_ON_DIRECTIONAL_PAD = Map.of(
             Position.UP, UP,
             Position.DOWN, DOWN,
@@ -77,13 +70,19 @@ public class ButtonLightenFingerPokeninator implements ChristmasSaver {
             Map.entry('9', NINE),
             Map.entry('A', NUMERIC_A)
     );
+    public static final int FIRST_CHALLENGE_KEYPADS = 3;
+    public static final int SECOND_CHALLENGE_KEYPADS = 26;
 
     @Override
     public String saveChristmas(final String input) {
+        return doTheThing(input, FIRST_CHALLENGE_KEYPADS);
+    }
+
+    private String doTheThing(final String input, final int keypads) {
         final Map<StartingPoint, Long> cache = new HashMap<>();
         final Map<Movement, List<List<Position>>> possiblePaths = new HashMap<>();
         return UtMath.restOfTheLongOwl(Arrays.stream(UtStrings.splitMultilineString(input))
-            .map(line -> parseAndFindComplexity(line, 3, possiblePaths, cache)));
+            .map(line -> parseAndFindComplexity(line, keypads, possiblePaths, cache)));
     }
 
     private long parseAndFindComplexity(final String numberCode, final int numberOfKeypads, final Map<Movement, List<List<Position>>> possiblePaths, final Map<StartingPoint, Long> cache) {
@@ -115,6 +114,19 @@ public class ButtonLightenFingerPokeninator implements ChristmasSaver {
         return result;
     }
 
+    private List<List<Position>> biteSize(final List<Position> code) {
+        final List<List<Position>> result = new LinkedList<>();
+        result.add(new LinkedList<>());
+        for (final Position button : code) {
+            result.getLast().add(button);
+            if (button.equals(DIRECTIONAL_A) || button.equals(NUMERIC_A)) {
+                result.add(new LinkedList<>());
+            }
+        }
+        result.removeLast();
+        return result;
+    }
+
     private List<List<Position>> findPossibleCodes(final Position location, final List<Position> code, final Map<Movement, List<List<Position>>> possiblePaths, final Position gap) {
         if (code.isEmpty()) {
             return List.of(new LinkedList<>());
@@ -135,19 +147,6 @@ public class ButtonLightenFingerPokeninator implements ChristmasSaver {
         return result;
     }
 
-    private List<List<Position>> biteSize(final List<Position> code) {
-        final List<List<Position>> result = new LinkedList<>();
-        result.add(new LinkedList<>());
-        for (final Position button : code) {
-            result.getLast().add(button);
-            if (button.equals(DIRECTIONAL_A) || button.equals(NUMERIC_A)) {
-                result.add(new LinkedList<>());
-            }
-        }
-        result.removeLast();
-        return result;
-    }
-
     private List<List<Position>> findPossiblePathsBetween(final Position start, final Position end, final Position gap) {
         if (start.equals(end)) {
             return List.of(new LinkedList<>(List.of(DIRECTIONAL_A)));
@@ -156,9 +155,10 @@ public class ButtonLightenFingerPokeninator implements ChristmasSaver {
         final List<List<Position>> paths = new LinkedList<>();
         for (final Position direction : sensibleDirections) {
             final Position next = start.offsetBy(direction);
+            final Position button = DIRECTIONS_ON_DIRECTIONAL_PAD.get(direction);
             if (!next.equals(gap)) {
                 for (final List<Position> subPath : findPossiblePathsBetween(next, end, gap)) {
-                    subPath.addFirst(DIRECTIONS_ON_DIRECTIONAL_PAD.get(direction));
+                    subPath.addFirst(button);
                     paths.add(subPath);
                 }
             }
@@ -168,10 +168,7 @@ public class ButtonLightenFingerPokeninator implements ChristmasSaver {
 
     @Override
     public String saveChristmasAgain(final String input) {
-        final Map<StartingPoint, Long> cache = new HashMap<>();
-        final Map<Movement, List<List<Position>>> possiblePaths = new HashMap<>();
-        return UtMath.restOfTheLongOwl(Arrays.stream(UtStrings.splitMultilineString(input))
-                .map(line -> parseAndFindComplexity(line, 26, possiblePaths, cache)));
+        return doTheThing(input, SECOND_CHALLENGE_KEYPADS);
     }
 
     private record Movement(Position start, Position end) {}
