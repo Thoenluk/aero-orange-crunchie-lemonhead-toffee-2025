@@ -1,6 +1,7 @@
 package ch.thoenluk.ut;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -33,6 +34,8 @@ public class UtCollections {
     }
 
     public static <T> boolean anyOverlap(final Collection<T> first, final Collection<T> second) {
-        return first.stream().anyMatch(second::contains);
+        final List<T> overlap = new LinkedList<>(first);
+        overlap.retainAll(second);
+        return !overlap.isEmpty();
     }
 }
