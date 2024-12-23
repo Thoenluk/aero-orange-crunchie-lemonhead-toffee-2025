@@ -1,4 +1,4 @@
-package ch.thoenluk.solvers.MonkeyBusiness;
+package ch.thoenluk.solvers.MonkeyTrading;
 
 import ch.thoenluk.ChristmasSaver;
 import ch.thoenluk.Day;
@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-// To any
 @Day(22)
 public class Relai implements ChristmasSaver {
     private static final int PRUNE_MASK = 0B00000000_11111111_11111111_11111111;
@@ -66,7 +65,7 @@ public class Relai implements ChristmasSaver {
         for (int i = 1; i < MARKET_DURATION; i++) {
             priceChanges[i] = prices[i] - prices[i - 1];
         }
-        for (int moment = 3; moment < MARKET_DURATION; moment++) {
+        for (int moment = 4; moment < MARKET_DURATION; moment++) {
             final int hash = pack(priceChanges, moment);
             result.putIfAbsent(hash, prices[moment]);
         }

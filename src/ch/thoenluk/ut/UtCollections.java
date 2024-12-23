@@ -1,5 +1,6 @@
 package ch.thoenluk.ut;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -29,5 +30,9 @@ public class UtCollections {
 
     private static <T> List<T> makePair(final List<T> list, final Integer index, final T secondElement) {
         return List.of(list.get(index), secondElement);
+    }
+
+    public static <T> boolean anyOverlap(final Collection<T> first, final Collection<T> second) {
+        return first.stream().anyMatch(second::contains);
     }
 }
