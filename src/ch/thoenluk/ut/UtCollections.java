@@ -9,13 +9,17 @@ import java.util.stream.Stream;
 
 public class UtCollections {
     public static <T> Stream<Position> findPositionsWithValueInMap(final Map<Position, T> map, final T value) {
-        return map.entrySet().stream()
-                .filter(entry -> value.equals(entry.getValue()))
-                .map(Map.Entry::getKey);
+        return findKeysWithValueInMap(map, value);
     }
 
     public static <T> Position findSinglePositionWithValueInMap(final Map<Position, T> map, final T value) {
         return findPositionsWithValueInMap(map, value).findAny().orElseThrow();
+    }
+
+    public static <K, V> Stream<K> findKeysWithValueInMap(final Map<K, V> map, final V value) {
+        return map.entrySet().stream()
+                .filter(entry -> value.equals(entry.getValue()))
+                .map(Map.Entry::getKey);
     }
 
     public static <T> Stream<List<T>> streamPairwise(final List<T> list) {
